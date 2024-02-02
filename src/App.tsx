@@ -6,7 +6,7 @@ import Button from "./ui/components/Button/Button";
 import InputText from "./ui/components/InputText/InputText";
 import Radio from "./ui/components/Radio/Radio";
 import Section from "./ui/components/Section/Section";
-import transformAddress from "./core/models/address";
+import transformAddress, { Address } from "./core/models/address";
 import useAddressBook from "./ui/hooks/useAddressBook";
 
 import "./App.css";
@@ -28,8 +28,8 @@ function App() {
   /**
    * Results states
    */
-  const [error, setError] = React.useState(undefined);
-  const [addresses, setAddresses] = React.useState([]);
+  const [error, setError] = React.useState<string | undefined>(undefined);
+  const [addresses,] = React.useState<Address[]>([]);
   /**
    * Redux actions
    */

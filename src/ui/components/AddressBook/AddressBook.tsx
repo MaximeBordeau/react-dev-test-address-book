@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
 
 import Address from "../Address/Address";
 import Button from "../Button/Button";
@@ -7,9 +6,10 @@ import Card from "../Card/Card";
 import useAddressBook from "../../hooks/useAddressBook";
 
 import $ from "./AddressBook.module.css";
+import { useAppSelector } from "../../../core/store";
 
 const AddressBook = () => {
-  const addresses = useSelector((state) => state.addressBook.addresses);
+  const addresses = useAppSelector((state) => state.addressBook.addresses);
   const { removeAddress, loadSavedAddresses, loading } = useAddressBook();
 
   React.useEffect(() => {

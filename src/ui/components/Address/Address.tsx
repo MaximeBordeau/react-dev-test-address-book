@@ -1,8 +1,10 @@
-import React from "react";
-
+import { FC } from "react"
 import $ from "./Address.module.css";
+import { Address } from "../../../core/models/address";
 
-const Address = ({ address }) => {
+type AddressProps = { address: Address }
+
+const Address: FC<AddressProps> = ({ address }) => {
   return (
     <address className={$.address}>
       {address.street} {address.houseNumber}, {address.postcode}, {address.city}

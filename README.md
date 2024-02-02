@@ -14,7 +14,7 @@ In order to start this assignment you need to:
 
 > Note: You will find some Bonus TODO's. These are not mandatory for completing this assignment. Feel free to flex your programming skills 💪
 
-## TODO's 
+## TODO's
 Here is a list of all the TODO's to make life a bit easier:
 
 ### Styling
@@ -31,13 +31,15 @@ Here is a list of all the TODO's to make life a bit easier:
 - [ ] Add conditional classNames for `primary` and `secondary` variant in `<Button />` component
 
 ### Redux
+- [ ] correct address slice reducers.
 - [ ] Prevent duplicate addresses.
 - [ ] Write a state update which removes an address from the addresses array.
+
+### Typescript
+- [ ] Add types to address.
+- [ ] Add types to `<Radio >` component.
 
 ## Submitting assignment
 You can submit your assignment by creating a merge request for your `feat/todo-assignment` branch. That's it, good luck! 🚀
 
 > If any questions might arise about the assignment please contact l.zimmerman@wearetriple.com
-
-
-

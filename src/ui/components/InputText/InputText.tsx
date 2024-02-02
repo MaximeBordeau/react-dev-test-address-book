@@ -1,8 +1,10 @@
-import React from "react";
+import { FC, InputHTMLAttributes } from "react";
 
 import $ from "./InputText.module.css";
 
-const InputText = ({ name, onChange, placeholder, value }) => {
+type InputTextProps = InputHTMLAttributes<HTMLInputElement>
+
+const InputText: FC<InputTextProps> = ({ name, onChange, placeholder, value }) => {
   return (
     <input
       className={$.inputText}

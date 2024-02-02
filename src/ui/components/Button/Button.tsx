@@ -1,9 +1,14 @@
-import React from "react";
 import cx from "classnames";
 
 import $ from "./Button.module.css";
+import { FC, ButtonHTMLAttributes, ReactChild } from "react";
 
-const Button = ({
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  children: ReactChild,
+  variant: "primary" | "secondary"
+}
+
+const Button: FC<ButtonProps> = ({
   children,
   onClick,
   type = "button",
