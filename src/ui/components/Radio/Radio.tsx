@@ -1,9 +1,15 @@
-import { FC } from "react";
+import { ChangeEventHandler, FC, ReactNode } from "react";
 
 import $ from "./Radio.module.css";
-
+ 
 //TODO: Type Radio Component
-type RadioProps = any
+
+type RadioProps = {
+  children: ReactNode;
+  id: string;
+  name: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+}
 
 const Radio: FC<RadioProps> = ({ children, id, name, onChange }) => {
   return (

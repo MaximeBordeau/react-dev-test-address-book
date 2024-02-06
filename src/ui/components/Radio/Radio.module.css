@@ -7,12 +7,18 @@
   gap: 1rem;
   margin: 1rem 0;
   max-width: var(--width-input);
-  padding: 1em;
+  padding: 0.5em;
   width: 100%;
+  
+}
+
+.adresse {
+padding: 1rem;
+
 }
 
 .radio:hover {
-  background: var(--color-accent);
+  background: #f2f2f2;
 }
 
 .radio input[type="radio"] {

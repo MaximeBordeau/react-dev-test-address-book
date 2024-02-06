@@ -1,115 +1,178 @@
-import React from "react";
+import { FormEvent, useState } from "react";
 
-import Address from "./ui/components/Address/Address";
 import AddressBook from "./ui/components/AddressBook/AddressBook";
-import Button from "./ui/components/Button/Button";
 import InputText from "./ui/components/InputText/InputText";
 import Radio from "./ui/components/Radio/Radio";
 import Section from "./ui/components/Section/Section";
-import transformAddress, { Address } from "./core/models/address";
 import useAddressBook from "./ui/hooks/useAddressBook";
-
 import "./App.css";
+import useFormFields from "./ui/hooks/useFormFields";
+import transformAddress, {
+  Address as ModelAddress,
+} from "./core/models/address";
+import { useDispatch, useSelector } from "react-redux";
+import { setAddresses } from "./core/store/addressBook";
+import ErrorMessage from "./ui/components/ErrorMessage/ErrorMessage";
+import Address from "./ui/components/Address/Address";
+import GenericForm from "./ui/components/GenericForm/GenericForm";
 
 function App() {
-  /**
-   * Form fields states
-   * TODO: Write a custom hook to set form fields in a more generic way:
-   * - Hook must expose an onChange handler to be used by all <InputText /> and <Radio /> components
-   * - Hook must expose all text form field values, like so: { zipCode: '', houseNumber: '', ...etc }
-   * - Remove all individual React.useState
-   * - Remove all individual onChange handlers, like handleZipCodeChange for example
-   */
-  const [zipCode, setZipCode] = React.useState("");
-  const [houseNumber, setHouseNumber] = React.useState("");
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [selectedAddress, setSelectedAddress] = React.useState("");
+  const { fields, handleChange, setFields } = useFormFields({
+    zipCode: "",
+    houseNumber: "",
+    firstName: "",
+    lastName: "",
+    selectedAddress: "",
+  });
   /**
    * Results states
    */
-  const [error, setError] = React.useState<string | undefined>(undefined);
-  const [addresses,] = React.useState<Address[]>([]);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [addresses, setLocalAddress] = useState<ModelAddress[]>([]);
   /**
    * Redux actions
    */
   const { addAddress } = useAddressBook();
+  const dispatch = useDispatch();
+  const storedAddresses = useSelector((state: any) => state.addressBook);
+  console.log(storedAddresses);
 
-  /**
-   * Text fields onChange handlers
-   */
-  const handleZipCodeChange = (e) => setZipCode(e.target.value);
+  // HandleChange directement 
+  const handleZipCodeChange = handleChange("zipCode");
+  const handleHouseNumberChange = handleChange("houseNumber");
+  const handleFirstNameChange = handleChange("firstName");
+  const handleLastNameChange = handleChange("lastName");
+  const handleSelectedAddressChange = handleChange("selectedAddress");
 
-  const handleHouseNumberChange = (e) => setHouseNumber(e.target.value);
-
-  const handleFirstNameChange = (e) => setFirstName(e.target.value);
-
-  const handleLastNameChange = (e) => setLastName(e.target.value);
-
-  const handleSelectedAddressChange = (e) => setSelectedAddress(e.target.value);
-
-  const handleAddressSubmit = async (e) => {
+  const handleAddressSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setError(undefined);
+    if (fields.zipCode === "") {
+      setError("Please enter zip code!");
+      return;
+    }
+    if (fields.houseNumber === "") {
+      setError("Please enter house number!");
+      return;
+    }
+    try {
+      const res = await fetch(
+        // API de base
+        // `http://api.postcodedata.nl/v1/postcode/?postcode=${fields.zipCode}&streetnumber=${fields.houseNumber}&ref=domeinnaam.nl&type=json`
+        
+        // Changement d'API -> gouv.fr
+        // houseNumber = adresse complète
+         `https://api-adresse.data.gouv.fr/search/?q=${fields.houseNumber}&type=housenumber&postcode=${fields.zipCode}`
 
-    /** TODO: Fetch addresses based on houseNumber and zipCode
-     * - Example URL of API: http://api.postcodedata.nl/v1/postcode/?postcode=1211EP&streetnumber=60&ref=domeinnaam.nl&type=json
-     * - Handle errors if they occur
-     * - Handle successful response by updating the `addresses` in the state using `setAddresses`
-     * - Make sure to add the houseNumber to each found address in the response using `transformAddress()` function
-     * - Bonus: Add a loading state in the UI while fetching addresses
-     */
+        
+      );
+      const data = await res.json();
+      console.log(data);
+      console.log(data.features[0].properties.city);
+      console.log(data.features[0].properties.name);
+
+
+      const constantResData = {
+        firstName: "",
+        lastName: "",
+        city: data.features[0].properties.city,
+        // houseNumber: fields.houseNumber,
+        houseNumber : data.features[0].properties.name,
+        lat: "",
+        lon: "",
+        postcode: fields.zipCode,
+        street: "",
+      };
+      const transformedAddress = transformAddress(constantResData);
+      setLocalAddress([transformedAddress]);
+    } catch (error: any) {
+      console.log(error?.message);
+    }
   };
-
-  const handlePersonSubmit = (e) => {
+  const handlePersonSubmit = (e: FormEvent) => {
     e.preventDefault();
-
-    if (!selectedAddress || !addresses.length) {
+    setError(undefined);
+    if (fields.firstName === "") {
+      setError("Entrez un nom !");
+      return;
+    }
+    if (!fields.selectedAddress || !addresses.length) {
       setError(
-        "No address selected, try to select an address or find one if you haven't"
+        "Veuillez selectionner une addresse"
       );
       return;
     }
 
-    const foundAddress = addresses.find(
-      (address) => address.id === selectedAddress
+    const foundAddress: ModelAddress | undefined = addresses.find(
+      (address) => address.id === fields.selectedAddress
     );
+    const isExist = storedAddresses?.addresses?.find(
+      (address: ModelAddress) => address.houseNumber === fields.houseNumber
+    );
+    if (isExist) {
+      setError("Impossible de dupliquer la même adresse");
+      return;
+    }
+    if (foundAddress !== undefined) {
+      addAddress({
+        ...foundAddress,
+        firstName: fields.firstName,
+        lastName: fields.lastName,
+      });
+      dispatch(
+        setAddresses([
+          {
+            ...foundAddress,
+            firstName: fields.firstName,
+            lastName: fields.lastName,
+          },
+        ])
+      );
+    }
+  };
 
-    addAddress({ ...foundAddress, firstName, lastName });
+  const handleClearFields = () => {
+    setFields({
+      zipCode: "",
+      houseNumber: "",
+      firstName: "",
+      lastName: "",
+      selectedAddress: "",
+    });
+    setLocalAddress([]);
+    setError(undefined)
   };
 
   return (
     <main>
-      <Section>
-        <h1>
-          Create your own address book!
-          <br />
-          <small>
-            Enter an address by zipcode add personal info and done! 👏
-          </small>
-        </h1>
+      <Section variant="light">
+        <div className="header">
+          <h1 id='title'>Créez votre propre carnet d'adresses !</h1>
+          <p id='subtitle'>Entrez le code postal suivi de l'adresse, ajoutez les informations du contact et c'est fait ! 👏</p>
+        </div>
         {/* TODO: Create generic <Form /> component to display form rows, legend and a submit button  */}
-        <form onSubmit={handleAddressSubmit}>
-          <fieldset>
-            <legend>🏠 Find an address</legend>
-            <div className="form-row">
-              <InputText
-                name="zipCode"
-                onChange={handleZipCodeChange}
-                placeholder="Zip Code"
-                value={zipCode}
-              />
-            </div>
-            <div className="form-row">
-              <InputText
-                name="houseNumber"
-                onChange={handleHouseNumberChange}
-                value={houseNumber}
-                placeholder="House number"
-              />
-            </div>
-            <Button type="submit">Find</Button>
-          </fieldset>
-        </form>
+        <GenericForm
+          onSubmit={handleAddressSubmit}
+          legend="🏠 Trouver une adresse"
+          btnText="Recherche"
+        >
+          <div className="form-row">
+            <InputText
+              name="zipCode"
+              onChange={handleZipCodeChange}
+              placeholder="Code Postal"
+              value={fields.zipCode}
+            />
+          </div>
+          <div className="form-row">
+            <InputText
+              name="houseNumber"
+              onChange={handleHouseNumberChange}
+              value={fields.houseNumber}
+              placeholder="Adresse complète"
+            />
+          </div>
+        </GenericForm>
         {addresses.length > 0 &&
           addresses.map((address) => {
             return (
@@ -123,36 +186,36 @@ function App() {
               </Radio>
             );
           })}
-        {/* TODO: Create generic <Form /> component to display form rows, legend and a submit button  */}
-        {selectedAddress && (
-          <form onSubmit={handlePersonSubmit}>
-            <fieldset>
-              <legend>✏️ Add personal info to address</legend>
-              <div className="form-row">
-                <InputText
-                  name="firstName"
-                  placeholder="First name"
-                  onChange={handleFirstNameChange}
-                  value={firstName}
-                />
-              </div>
-              <div className="form-row">
-                <InputText
-                  name="lastName"
-                  placeholder="Last name"
-                  onChange={handleLastNameChange}
-                  value={lastName}
-                />
-              </div>
-              <Button type="submit">Add to addressbook</Button>
-            </fieldset>
-          </form>
+        {fields.selectedAddress !== "" && (
+          <GenericForm
+            legend="✏️ Ajouter les informations personnelles"
+            onSubmit={handlePersonSubmit}
+            btnText="Enregistrer"
+
+          >
+            <div className="form-row">
+              <InputText
+                name="firstName"
+                placeholder="Prénom"
+                onChange={handleFirstNameChange}
+                value={fields.firstName}
+              />
+            </div>
+            <div className="form-row">
+              <InputText
+                name="lastName"
+                placeholder="Nom de famille"
+                onChange={handleLastNameChange}
+                value={fields.lastName}
+              />
+            </div>
+          </GenericForm>
         )}
+        {error && <ErrorMessage message={error} />}
 
-        {/* TODO: Create an <ErrorMessage /> component for displaying an error message */}
-        {error && <div className="error">{error}</div>}
-
-        {/* TODO: Add a button to clear all form fields. Button must look different from the default primary button, see design. */}
+        <button className="clear-btn" onClick={handleClearFields}>
+          Effacer la recherche
+        </button>
       </Section>
 
       <Section variant="dark">

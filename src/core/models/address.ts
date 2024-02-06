@@ -1,16 +1,23 @@
 type AddressInfo = Partial<{
-  firstName: string,
-  lastName: string,
-  city: string,
-  houseNumber: string,
-  lat: string,
-  lon: string,
-  postcode: string,
-  street: string
-}>
+  firstName: string;
+  lastName: string;
+  city: string;
+  houseNumber: string;
+  lat: string;
+  lon: string;
+  postcode: string;
+  street: string;
+}>;
 
-// TODO: Add typing for this element
-export type Address = any
+export type Address = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  city: string;
+  houseNumber: string;
+  postcode: string;
+  street: string;
+};
 
 export default function transformAddress(data: AddressInfo): Address {
   const { firstName, lastName, city, houseNumber, lat, lon, postcode, street } =
@@ -19,7 +26,7 @@ export default function transformAddress(data: AddressInfo): Address {
     city: city || "",
     firstName: firstName || "",
     houseNumber: houseNumber || "",
-    id: `${lat || Date.now()}_${lon || Math.random()}`,
+    id: `${lat || Date.now()}_${lon || Math.random() * 1000000}_${houseNumber}`,
     lastName: lastName || "",
     postcode: postcode || "",
     street: street || "",

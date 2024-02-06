@@ -1,12 +1,12 @@
-import { FC, ReactChild } from "react";
+import { FC, ReactNode } from "react";
 import cx from "classnames";
 
 import $ from "./Section.module.css";
 
 type SectionProps = {
-  variant: "dark" | "light",
-  children: ReactChild
-}
+  variant: "dark" | "light";
+  children: ReactNode;
+};
 
 const Section: FC<SectionProps> = ({ children, variant = "light" }) => {
   return (

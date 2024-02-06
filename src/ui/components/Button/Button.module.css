@@ -23,3 +23,10 @@
 /** TODO: Create separate styles for .primary and .secondary variants of this button:
 * - Must use the CSS variables declared in App.css
 */
+
+.primary{
+  background-color: #646cff;
+}
+.secondary{
+  background-color: #1a1a1a;
+}

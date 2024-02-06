@@ -1,18 +1,22 @@
-import React from "react";
+import { useCallback, useState } from "react";
 import { useStore } from "react-redux";
 
 import transformAddress, { Address } from "../../core/models/address";
 import databaseService from "../../core/services/databaseService";
-import { addAddress, removeAddress, setAddresses } from "../../core/store/addressBook";
+import {
+  addAddress,
+  removeAddress,
+  setAddresses,
+} from "../../core/store/addressBook";
 import { useAppDispatch } from "../../core/store";
 import { RootState } from "../../core/store/configure";
 
 export default function useAddressBook() {
   const dispatch = useAppDispatch();
   const store = useStore<RootState>();
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const updateDatabase = React.useCallback(() => {
+  const updateDatabase = useCallback(() => {
     const state = store.getState();
     databaseService.setItem("addresses", state.addressBook.addresses);
   }, [store]);
@@ -20,12 +24,12 @@ export default function useAddressBook() {
   return {
     /** Add address to the redux store */
     addAddress: (address: Address) => {
-      addAddress(address)
+      addAddress(address);
       updateDatabase();
     },
     /** Remove address by ID from the redux store */
     removeAddress: (id: string) => {
-      removeAddress(id)
+      removeAddress(id);
       dispatch({ type: "address/remove", payload: id });
       updateDatabase();
     },
@@ -37,7 +41,7 @@ export default function useAddressBook() {
         setLoading(false);
         return;
       }
-      setAddresses(saved.map((address) => transformAddress(address)))
+      setAddresses(saved.map((address) => transformAddress(address)));
       setLoading(false);
     },
     loading,

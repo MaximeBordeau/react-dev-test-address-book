@@ -1,5 +1,15 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-primary: 'Roboto', sans-serif;
+
+  --color-background : #C4C8D8;
+
+  --border-radius-default: 4px;
+  --border-radius-xl: 16px;
+
+  --color-accent: #646cff; 
+  --color-accent-hover: #535bf9 ; 
+
+  /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
   line-height: 1.5;
   font-weight: 400;
 
@@ -28,11 +38,29 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: var(--font-primary);
+
+  background-color: var(--color-background);
+  
+
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 1.7em;
   line-height: 1.1;
+
+  
+}
+
+#subtitle{
+  color: var(--color-text-light);
+
+}
+
+.genericform {
+  border: none;
+
+
 }
 
 button {

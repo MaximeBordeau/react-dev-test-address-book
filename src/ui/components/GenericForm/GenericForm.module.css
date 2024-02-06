@@ -1,0 +1,25 @@
+.fieldset {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.fieldset {
+   
+  border: rgb(201, 201, 201) 1px solid;
+  border-left: none;
+  border-right: none;
+}
+
+legend {
+    text-align: left;
+
+}
+
+input {
+    border: rgb(201, 201, 201) 1px solid !important;
+   
+
+
+}
